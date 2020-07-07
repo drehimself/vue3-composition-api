@@ -4,11 +4,11 @@
       <div class="bg-white shadow-md rounded px-8 py-8">
         <h2 class="text-2xl font-semibold">{{ title }}</h2>
         <form action="#" class="mt-4" @submit.prevent="addTodo">
-          <input v-model="state.todoFromInput" type="text" class="w-full border border-gray-500 rounded placeholder-gray-600 px-2 py-3" placeholder="What needs to be done?">
+          <input v-model="todoFromInput" type="text" class="w-full border border-gray-500 rounded placeholder-gray-600 px-2 py-3" placeholder="What needs to be done?">
         </form>
-        <div v-if="state.todos.length">
+        <div v-if="todos.length">
           <ul class="text-2xl mt-4 space-y-6">
-            <li v-for="todo in state.todos" :key="todo.id" class="flex items-center justify-between">
+            <li v-for="todo in todos" :key="todo.id" class="flex items-center justify-between">
               <div class="flex items-center">
                 <input type="checkbox" v-model="todo.isComplete">
                 <div
@@ -34,48 +34,46 @@
 </template>
 
 <script>
-import { reactive, computed, onMounted, watch } from 'vue'
+import { reactive, computed, onMounted, watch, ref } from 'vue'
 export default {
   props: ['title'],
   setup(props) {
-    const state = reactive({
-      todoFromInput: '',
-      todoId: 4,
-      todos: [
-        {
-          id: 1,
-          description: 'Finish Screencast',
-          isComplete: false,
-        },
-        {
-          id: 2,
-          description: 'Learn Vue 3',
-          isComplete: false,
-        },
-        {
-          id: 3,
-          description: 'Paint Wall',
-          isComplete: false,
-        },
-      ]
-    })
+    const todoFromInput = ref('')
+    const todoId = ref(4)
+    const todos = ref([
+      {
+        id: 1,
+        description: 'Finish Screencast',
+        isComplete: false,
+      },
+      {
+        id: 2,
+        description: 'Learn Vue 3',
+        isComplete: false,
+      },
+      {
+        id: 3,
+        description: 'Paint Wall',
+        isComplete: false,
+      },
+    ])
 
     function addTodo() {
-      state.todos.push({
-        id: state.todoId,
-        description: state.todoFromInput,
+      todos.value.push({
+        id: todoId.value,
+        description: todoFromInput.value,
         isComplete: false,
       })
 
-      state.todoId++
-      state.todoFromInput = ''
+      todoId.value++
+      todoFromInput.value = ''
     }
 
     function deleteTodo(id) {
-      state.todos = state.todos.filter(todo => todo.id !== id)
+      todos.value = todos.value.filter(todo => todo.id !== id)
     }
 
-    const itemsLeft = computed(() => state.todos.filter(todo => !todo.isComplete).length)
+    const itemsLeft = computed(() => todos.value.filter(todo => !todo.isComplete).length)
 
     onMounted(() => {
       console.log('Todo mounted')
@@ -83,7 +81,7 @@ export default {
     })
 
     watch(
-      () => state.todoId,
+      () => todoId.value,
       (newValue, oldValue) => {
         console.log('New Value: ' + newValue)
         console.log('Old Value: ' + oldValue)
@@ -91,7 +89,9 @@ export default {
     )
 
     return {
-      state,
+      todoFromInput,
+      todoId,
+      todos,
       addTodo,
       deleteTodo,
       itemsLeft,
